@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="./css/iconfont.css?v=202312072128">
+    <link rel="stylesheet" href="./css/login.css?v=202312072128">
+    <script src="./js/jquery-3.7.1.min.js?v=202312072128"></script>
+    <script src="./js/md5.min.js?v=202312072128" async defer></script>
+    <script src="./js/login.js?v=202312072128"></script>
+    <script src="./js/watermark.js?v=202312072128"></script>
+</head>
+
+<body>
+    <div class="login-box">
+        <div class="login-top">
+            <img src="./image/logo.svg" alt="">
+            <span>登录</span>
+        </div>
+        <p class="notice" id="notice">公告</p>
+        <div class="select-login-type">
+            <div class="select-login-type-item select-login-active" onclick="selectLoginType(0)" id="login-type-0">
+                <span>账号登录</span>
+            </div>
+            <div class="select-login-type-item" onclick="selectLoginType(1)" id="login-type-1">
+                <span>扫码登录</span>
+            </div>
+        </div>
+        <div class="input-form">
+            <div class="input-items" id="messagebox">
+                <span class="iconfont icon-cuowu"></span>
+                <span id="errorMessage"></span>
+            </div>
+            <div class="input-items">
+                <span class="iconfont icon-yonghu_yonghu"></span>
+                <input type="text" placeholder="请输入学号" id="name">
+            </div>
+            <div class="input-items">
+                <span class="iconfont icon-jiesuo"></span>
+                <input type="password" placeholder="请输入密码" id="pwd">
+                <span id="eye" class="iconfont icon-biyanjing" onclick="pwd_hidden()">
+                </span>
+            </div>
+            <div class="verify">
+                <div class="verify-items input-items">
+                    <span class="iconfont icon-yanzhengma"></span>
+                    <input type="text" placeholder="请输入验证码" id="verify">
+                </div>
+                <img src="/api/verify" alt="" id="verify-img" onclick="getCode1()">
+            </div>
+
+            <div class="forgot-password">
+                <div class="register" onclick="registerJump()">注册</div>
+                <div onclick="forgotPasswd()">忘记密码</div>
+            </div>
+        </div>
+        <div class="disableindex">
+            <!-- <img src="./image/load.png" alt=""> -->
+            <!-- <span>正在加载...</span> -->
+        </div>
+        <div class="login-btn">
+            <button onclick="login_login()">登录</button>
+        </div>
+        <div class="other-login">
+            <span>其他登录方式</span>
+            <div class="other-login-btn">
+                <div class="other-login-btn-item" onclick="login_github()">
+                    <span class="iconfont icon-GitHub"></span>
+                </div>
+                <div class="other-login-btn-item" onclick="login_qywxlogin()">
+                    <img src="./image/qywx.svg" alt="">
+                </div>
+                <div class="other-login-btn-item" onclick="login_local()">
+                    <span class="iconfont icon-wifi"></span>
+                </div>
+            </div>
+        </div>
+        <div class="bindQQ editqq">
+            <button onclick="bindQQ(1)">绑定</button>
+            <button onclick="bindQQ(0)">不绑定</button>
+        </div>
+    </div>
+    <footer>
+        <span>Owner by 朱铖彬</span>
+    </footer>
+    <script>
+        async function fetchNotice() {
+            try {
+                var notice = await getNotice(); // 等待异步操作完成
+                console.log(notice);
+                $("#notice").html(notice.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchNotice();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,423 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+.view {
+    display: flex;
+    /* background-color: red; */
+    height: 650px;
+    width: 960px;
+    margin: 20px auto;
+    border-radius: 6px;
+    box-shadow: #888 0px 0px 8px 4px;
+    user-select: none;
+}
+
+.product {
+    background-color: wheat;
+    width: 60px;
+    height: 100%;
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-radius: 5px 0 0 5px;
+    position: relative;
+}
+
+.logout {
+    position: absolute;
+    bottom: 25px;
+}
+
+.msgList {
+    width: 300px;
+    height: 100%;
+    background: white;
+}
+
+.msgBox {
+    width: 600px;
+    background-color: #eee;
+    border-radius: 0 5px 5px 0;
+    height: 100%;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin: 20px 0;
+}
+.seach {
+    display: flex;
+    justify-content: center;
+}
+
+.seach-input {
+    background-color: #efefef;
+    border: none;
+    outline: none;
+    padding: 5px 10px;
+}
+
+.input-item {
+    background-color: #efefef;
+    width: 80%;
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+
+.product-item {
+    padding: 10px 10px;
+}
+
+.product-item .iconfont {
+    font-size: 25px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    /* margin: 20px 0;*/
+}
+
+.msgListBox {
+    height: calc(100% - 61px);
+    overflow-y: scroll;
+ }
+
+.msgListBoxItem {
+    display: flex;
+    /* align-content: center; */
+    align-items: center;
+    padding: 15px 20px;
+    gap: 10px;
+    box-sizing: border-box;
+ }
+.msgListBoxItem:hover {
+    background-color: #c0e3b8;
+    cursor: pointer;
+ }
+
+ ::-webkit-scrollbar-track {
+    background-color: #ffffff00;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+    width: 2px;
+    background-color: #ffffff00;
+}
+
+/* 滚动条 thumb（滑块） */
+::-webkit-scrollbar-thumb {
+    background-color: #ffffff00;
+    border-radius: 1px;
+}
+
+/* 滚动条在hover状态下 */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #ffffff00;
+}
+
+.right {
+    width: 78%;
+}
+
+.right-up {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.lasttime {
+    font-size: 0.5em;
+}
+
+.right-down {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.false-count {
+    background-color: #009ada;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+}
+
+.lastmessage {
+    font-size: 0.8em;
+    color: #a4a4a4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 16.8px;
+}
+
+.active {
+    background-color: #ccc;
+    border-radius: 5px;
+    color: aquamarine;
+}
+
+.msgBoxTitle {
+    width: 100%;
+    height: 65px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: solid 1px #cfcfcf;
+    border-top-right-radius: 5px;
+}
+
+.msgBoxTitle > span {
+    font-size: 20px;
+}
+
+.msgContentItemLeft > img,.msgContentItemRight > img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.msgContent {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 20px;
+    padding: 10px;
+    height: 385px;
+    border-bottom: solid 1px #cfcfcf;
+    overflow-y: scroll;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.msgContentItemLeft,.msgContentItemRight {
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.msgContentItemRight {
+    flex-direction: row-reverse;
+}
+
+
+.rightMsgSpan,
+.leftMsgSpan{
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 80%;
+    word-break: break-all; /* 在单词内部允许换行 */
+    word-wrap: break-word; /* 允许单词内部换行 */
+}
+
+.rightMsgSpan{
+    background-color: #57e491;
+}
+
+.msgBoxItem {
+    width: 80%;
+    display: flex;
+    /* justify-content: flex-end; */
+}
+.msgContentItemRight > .msgBoxItem {
+    justify-content: flex-end;
+} 
+
+.msgBoxItem > img{
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 20px;
+}
+
+.msgInput > button {
+    margin: 10px 20px;
+    width: 80px;
+    background-color: #009ada;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    height: 25px;
+}
+
+#messageText {
+    padding: 10px;
+    width: 100%;
+    height: 125px;
+    margin: 0 auto;
+    border: none;
+    outline: none;
+    /* padding: 5px 10px; */
+    background: transparent;
+    resize: vertical;
+    overflow-y: scroll;
+    font-size: 1.2em;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.msgInput {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* position: relative;*/
+}
+
+
+.mask {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #55555559;
+}
+
+.msgImageLagre {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.msgImageLagre > img {
+    max-width: 100%;
+    max-height: 100%;
+    z-index: 999;
+    
+}
+
+.msgInput-product {
+    width: 100%;
+    display: flex;
+    gap: 15px;
+    padding: 5px 25px 0 25px;
+    box-sizing: border-box;
+}
+
+.msgInput-product-item .iconfont {
+    font-size: 25px;
+}
+
+.logoutTip {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.logoutTipContent {
+    width: 300px;
+    height: 150px;
+    background-color: #fff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    z-index: 999;
+}
+
+.logoutTipContentBtn button{
+    width: 85px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    margin: 0 20px;
+}
+
+.logoutTipContentBtn button:hover {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.logoutTipContentBtn button:nth-child(1) {
+    background-color: #009ada;
+    color: white;
+}
+
+.logoutTipContentBtn button:nth-child(2) {
+    background-color: #fff;
+    color: black;
+    border: solid 1px #afafaf;
+}
+
+.initMsgBoxContent {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 20px;
+    color: slateblue;
+    opacity: 0.7;
+}
+
+.initMsgBox {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.EmojiList {
+    width: 450px;
+    height: 330px;
+    background-color: #ffffffed;
+    border-radius: 20px;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    overflow-y: scroll;
+    user-select: none;
+    display: none;
+    position: absolute;
+    bottom: 31px;
+    left: -10px;
+    padding: 10px;
+  }
+
+  .EmojiList span {
+    font-size: 25px;
+  }
+
+  .icon-xiaolian {
+    position: relative;
+  }
+
+  .welcomeImg {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+  }
+
+  #messageText img{
+    width: 100px;
+  }

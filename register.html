@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="./css/iconfont.css?v=202312072128">
+    <link rel="stylesheet" href="./css/login.css">
+    <script src="./js/jquery-3.7.1.min.js?v=202312072128"></script>
+    <script src="./js/md5.min.js?v=202312072128" async defer></script>
+    <script src="./js/login.js?v=202312072128"></script>
+    <script src="./js/watermark.js?v=202312072128"></script>
+    <!-- <script src="./js/turnstile/v0/b/cs25v2v/api.js" async defer></script> -->
+
+</head>
+
+<body>
+    <div class="login-box">
+        <div class="login-top">
+            <img src="./image/logo.svg" alt="">
+            <span>注册</span>
+        </div>
+        <div class="input-form">
+            <div class="input-items" id="messagebox">
+                <span class="iconfont icon-cuowu"></span>
+                <span id="errorMessage"></span>
+            </div>
+            <div class="input-items" id="xuehao">
+                <span class="iconfont icon-yonghu_yonghu"></span>
+                <input type="text" placeholder="请输入学号" id="name">
+            </div>
+            <div class="input-items" id="xingming">
+                <span class="iconfont icon-yonghu_yonghu"></span>
+                <input type="text" placeholder="请输入姓名" id="username">
+            </div>
+            <div class="input-items">
+                <span class="iconfont icon-jiesuo"></span>
+                <input type="password" placeholder="请设置密码" id="pwd">
+                <span id="eye" class="iconfont icon-biyanjing" onclick="pwd_hidden()">
+                </span>
+            </div>
+            <div class="input-items">
+                <span class="iconfont icon-jiesuo"></span>
+                <input type="password" placeholder="请再次输入密码" id="againpwd">
+                <span id="eye1" class="iconfont icon-biyanjing" onclick="pwd_hidden1()">
+                </span>
+            </div>
+            <div class="input-item">
+                <div class="RegisterContent">
+                    <span>请使用新乡学院APP扫描二维码</span>
+                    <img src="/api/qr/qrcode" alt="" class="registerQr">
+                    <div class="RegisterShow">
+                        <span id="RegisterShowText"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="verify">
+                <div class="verify-items input-items">
+                    <span class="iconfont icon-yanzhengma"></span>
+                    <input type="text" placeholder="请输入验证码" id="verify">
+                </div>
+                <img src="/api/verify" alt="" id="verify-img" onclick="getCode1()">
+            </div>
+            <!-- <div class="cf-turnstile" data-sitekey="0x4AAAAAAANxKDoEp0TUq117" data-callback="javascriptCallback"></div> -->
+        </div>
+        <div class="disableindex">
+            <!-- <img src="./image/load.png" alt=""> -->
+            <!-- <span>正在加载...</span> -->
+        </div>
+        <div class="login-btn">
+            <button onclick="register()" disabled="disabled">不可点击</button>
+        </div>
+    </div>
+    <footer>
+        <span>Owner by 朱铖彬</span>
+    </footer>
+    <script>
+        
+        checkQrScan()
+
+    </script>
+</body>
+
+</html>

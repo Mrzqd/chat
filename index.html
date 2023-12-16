@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script src="./js/watermark.js"></script> -->
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/c/font_4371709_tgxh0w0jg2b.css">
+    <script src="./js/main.js"></script>
+    <script src="./js/emojy.js"></script>
+</head>
+
+<body>
+    <div class="view">
+        <div class="product">
+            <img src="https://xxu.zcbz.online/image/1698998253056_photo_2023-10-20_13-56-46.jpg" alt="" class="avatar">
+            <div class="product-item active" onclick="showMessageList()" id="messageListIcon">
+                <span class="iconfont icon-xiaoxizhongxin"></span>
+            </div>
+            <div class="product-item" onclick="showFriendList()" id="friendListIcon">
+                <span class="iconfont icon-yonghu"></span>
+            </div>
+            <div class="product-item logout" onclick="showLogoutTip()">
+                <span class="iconfont icon-tuichu"></span>
+            </div>
+        </div>
+        <div class="msgList">
+            <div class="seach">
+                <div class="input-item">
+                    <span class="iconfont icon-sousuo"></span>
+                    <input type="text" class="seach-input" placeholder="搜索">
+                </div>
+            </div>
+            <div class="msgListBox">
+                <div class="msgListBoxItem" onclick="showUidMessage(20205003077)" data-touid="20205003077">
+                    <div class="left">
+                        <img src="https://xxu.zcbz.online/image/1698998253056_photo_2023-10-20_13-56-46.jpg" alt=""
+                            class="user-avatar">
+                    </div>
+                    <div class="right">
+                        <div class="right-up">
+                            <div class="username">朱铖彬</div>
+                            <div class="lasttime">2021-10-20 13:56:46</div>
+                        </div>
+                        <div class="right-down">
+                            <div class="lastmessage">我是最后一条消息</div>
+                            <div class="false-count"><span>5</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="msgBox">
+            <div class="initMsgBox">
+                <div class="initMsgBoxContent">
+                    <div class="initMsgBoxContentTitle">欢迎使用</div>
+                    <div class="initMsgBoxContentText">请在左侧选择一个好友进行聊天</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="msgImageLagre">
+        <div class="mask" onclick="hideMsgImageLagre()"></div>
+        <img src="" alt="">
+    </div>
+    <div class="logoutTip">
+        <div class="mask" onclick="hideLogoutTip()"></div>
+        <div class="logoutTipContent">
+            <div class="logoutTipContentTitle">提示</div>
+            <div class="logoutTipContentText">确定要退出登录吗？</div>
+            <div class="logoutTipContentBtn">
+                <button onclick="logout()">确定</button>
+                <button onclick="hideLogoutTip()">取消</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 当页面加载完成后
+        window.onload = function () {
+            fetch("/api/user/prefile")
+                .then(response => {
+                    if (response.status == 401) {
+                        window.location.href = './login.html';
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+                    if (data) {
+                        fristLoad = localStorage.getItem('fristLoad');
+                        if (fristLoad == null) {
+                            // 第一次加载
+                            localStorage.setItem('fristLoad', 'true');
+                            // 显示欢迎提示
+                            showWelcomeTip();
+                        }
+                        showMessageList();
+                        document.addEventListener('click', function (e) {
+                            // console.log(e.target);
+                            var emojiList = document.querySelector('.EmojiList');
+                            if (emojiList.style.display == 'flex' && !emojiList.contains(e.target) && e.target.className != 'iconfont icon-xiaolian' && e.target.className != 'emjoyItem') {
+                                emojiList.style.display = 'none';
+                            }
+                        })
+                        // 监听回车键
+                        document.addEventListener('keydown', function (e) {
+                            if (sendMsgToUid != "") {
+                                console.log(sendMsgToUid)
+                                console.log(e)
+                                if (e.key == "Enter") {
+                                    event.preventDefault();
+                                    sendMessage(sendMsgToUid);
+                                }
+                            }
+                        })
+                    }
+
+                })
+
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 4313840 */
+  src: url('//at.alicdn.com/t/c/font_4313840_yqnhujrjtg.woff2?t=1700975430204') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4313840_yqnhujrjtg.woff?t=1700975430204') format('woff'),
+       url('//at.alicdn.com/t/c/font_4313840_yqnhujrjtg.ttf?t=1700975430204') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-wifi:before {
+  content: "\eda9";
+}
+
+.icon-caidan:before {
+  content: "\e668";
+}
+
+.icon-GitHub:before {
+  content: "\ea0a";
+}
+
+.icon-qiyeweixin:before {
+  content: "\e6d3";
+}
+
+.icon-QQ:before {
+  content: "\e882";
+}
+
+.icon-yanzhengma:before {
+  content: "\e609";
+}
+
+.icon-cuowu:before {
+  content: "\e600";
+}
+
+.icon-biyanjing:before {
+  content: "\e901";
+}
+
+.icon-yanjing:before {
+  content: "\e8bf";
+}
+
+.icon-jiesuo:before {
+  content: "\e669";
+}
+
+.icon-yonghu_yonghu:before {
+  content: "\e678";
+}

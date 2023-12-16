@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Editable Div Paste Image</title>
+  <meta charset="UTF-8">
+  <style>
+    #messageText img {
+      width: 200px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div contenteditable="true" id="messageText"></div>
+  <button onclick="submit()">提交</button>
+  <script type="text/javascript">
+
+    function base64ToBlob(b64Data, contentType, sliceSize) {
+      contentType = contentType || '';
+      sliceSize = sliceSize || 512;
+
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
+
+      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+
+      var blob = new Blob(byteArrays, { type: contentType });
+      return blob;
+    }
+
+
+    function submit() {
+      // 获取messageText内容，查看是否有图片
+      var messageText = document.getElementById('messageText');
+      // 如果有图片将图片上传
+      imgList = messageText.getElementsByTagName('img');
+
+
+      console.log(messageText.innerText)
+      return
+
+      for (var i = 0; i < imgList.length; i++) {
+        var img = imgList[i];
+        var src = img.src;
+        var base64ImageContent = src.replace(/^data:image\/(png|jpg);base64,/, "");
+        // 转为Blob对象
+        var blob = base64ToBlob(base64ImageContent, 'image/png');
+
+
+        var formData = new FormData();
+        formData.append('image', blob, 'image.png');
+        fetch('/api/user/upload/image?touid=20205003077', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => {
+            if (response.ok) {
+              return response.text();
+            }
+            throw new Error('上传失败');
+          })
+          .then(filedata => {
+            console.log('上传成功！服务器响应:', filedata);
+            filedata = JSON.parse(filedata)
+            options = {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                touser: uid,
+                message: currentURL = window.location.protocol + '//' + window.location.host + '/upfile/image/' + filedata.data,
+                type: "image"
+              })
+            }
+            console.log(options)
+            fetch("/api/user/sendMessage", options)
+              .then(response => response.json())
+              .then((message) => {
+                if (!message.status) {
+                  alert(message.message)
+                } else {
+                  // 清空输入框
+                  document.getElementById("messageText").value = "";
+                }
+              })
+              .catch(error => {
+                console.error('上传失败:', error);
+                alert("上传失败")
+              });
+          })
+          .catch(error => {
+            console.error('上传失败:', error);
+          });
+      }
+    }
+  </script>
+</body>
+
+</html>
