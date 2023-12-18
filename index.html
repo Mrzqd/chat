@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8">
@@ -34,22 +34,7 @@
                 </div>
             </div>
             <div class="msgListBox">
-                <div class="msgListBoxItem" onclick="showUidMessage(20205003077)" data-touid="20205003077">
-                    <div class="left">
-                        <img src="https://xxu.zcbz.online/image/1698998253056_photo_2023-10-20_13-56-46.jpg" alt=""
-                            class="user-avatar">
-                    </div>
-                    <div class="right">
-                        <div class="right-up">
-                            <div class="username">朱铖彬</div>
-                            <div class="lasttime">2021-10-20 13:56:46</div>
-                        </div>
-                        <div class="right-down">
-                            <div class="lastmessage">我是最后一条消息</div>
-                            <div class="false-count"><span>5</span></div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
         </div>
@@ -77,10 +62,15 @@
             </div>
         </div>
     </div>
+    <div class="userStatus">
+    </div>
+    <div class="WSserverStatus">
+        服务已断开，正在重连...
+    </div>
     <script>
         // 当页面加载完成后
         window.onload = function () {
-            fetch("/api/user/prefile")
+            fetch("/api/user/getWSToken")
                 .then(response => {
                     if (response.status == 401) {
                         window.location.href = './login.html';
@@ -96,32 +86,39 @@
                             localStorage.setItem('fristLoad', 'true');
                             // 显示欢迎提示
                             showWelcomeTip();
+                            return;
                         }
-                        showMessageList();
+                        // showMessageList();
                         document.addEventListener('click', function (e) {
                             // console.log(e.target);
                             var emojiList = document.querySelector('.EmojiList');
-                            if (emojiList.style.display == 'flex' && !emojiList.contains(e.target) && e.target.className != 'iconfont icon-xiaolian' && e.target.className != 'emjoyItem') {
-                                emojiList.style.display = 'none';
+                            if (emojiList) {
+                                if (emojiList.style.display == 'flex' && !emojiList.contains(e.target) && e.target.className != 'iconfont icon-xiaolian' && e.target.className != 'emjoyItem') {
+                                    emojiList.style.display = 'none';
+                                }
                             }
+
                         })
                         // 监听回车键
                         document.addEventListener('keydown', function (e) {
                             if (sendMsgToUid != "") {
-                                console.log(sendMsgToUid)
-                                console.log(e)
+                                // console.log(sendMsgToUid)
+                                // console.log(e)
                                 if (e.key == "Enter") {
                                     event.preventDefault();
                                     sendMessage(sendMsgToUid);
                                 }
                             }
                         })
+                        const token = data.data;
+                        startWebSocket(token)
+                        showMessageList()
                     }
-
+                }).catch(error => {
+                    alert("网络错误，请刷新重试")
                 })
 
         }
     </script>
 </body>
-
 </html>

@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const request = require('util').promisify(require('request'));
 var md5 = require("md5");
 
+const PORT = 18878;
 
 // 文件上传
 const multer = require('multer');
@@ -15,7 +16,6 @@ const crypto = require('crypto');
 
 const app = express();
 const db = new sqlite3.Database('data.db');
-
 
 
 
@@ -39,18 +39,18 @@ app.use(session({
 db.serialize(() => {
     db.run(
         `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,
-             uid TEXT,
-             username TEXT,
-             password TEXT)`
+             uid TEXT UNIQUE,
+             username TEXT NOT NULL,
+             password TEXT NOT NULL)`
     );
     db.run(
         `CREATE TABLE IF NOT EXISTS msgdata (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fromuid TEXT,
-            touid TEXT,
+            fromuid TEXT NOT NULL,
+            touid TEXT NOT NULL,
             message TEXT,
             time TIMESTAMP DEFAULT (datetime('now', 'localtime')),
-            type TEXT,
+            type TEXT NOT NULL,
             status BOOLEAN DEFAULT FALSE)`
     );
     db.run(
@@ -59,13 +59,14 @@ db.serialize(() => {
             uid TEXT,
             friend TEXT)`
     );
-
+    db.run(
+        `CREATE TABLE IF NOT EXISTS wstoken (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid TEXT NOT NULL,
+            username TEXT NOT NULL,
+            token TEXT NOT NULL)`
+    )
 });
-
-
-
-
-
 
 
 
@@ -106,7 +107,7 @@ app.get('/api/verify', async (req, res) => {
 
 // 验证码校验拦截器
 const vcaptcha = async (req, res, next) => {
-    if (req.session.scranQR){
+    if (req.session.scranQR) {
         return next();
     }
     const { captcha } = req.body;
@@ -119,7 +120,7 @@ const vcaptcha = async (req, res, next) => {
     return next();
 }
 
-app.post('/api/register',vcaptcha, (req, res) => {
+app.post('/api/register', vcaptcha, (req, res) => {
     const { password } = req.body;
     const { uid, username } = req.session
     // const { uid, username, password } = req.body;
@@ -148,11 +149,11 @@ app.post('/api/register',vcaptcha, (req, res) => {
     });
 });
 
-app.post('/api/login',vcaptcha, (req, res) => {
-    if (req.session.scranQR) { 
+app.post('/api/login', vcaptcha, (req, res) => {
+    if (req.session.scranQR) {
         var username = req.session.uid
-        var password  = "扫码用户"
-    }else{
+        var password = "扫码用户"
+    } else {
         var { username, password } = req.body;
     }
     console.log(username, password)
@@ -166,7 +167,7 @@ app.post('/api/login',vcaptcha, (req, res) => {
         if (!row) {
             return res.send({ "status": 3, "msg": "账号不存在", "data": null })
         }
-        if (req.session.scranQR) { 
+        if (req.session.scranQR) {
             req.session.loginType = 'user';
             req.session.scranQR = false
             return res.send({ "status": 1, "msg": "登录成功", "data": null })
@@ -183,7 +184,7 @@ app.post('/api/login',vcaptcha, (req, res) => {
 });
 
 
-app.post('/api/user/logout', (req, res) => { 
+app.post('/api/user/logout', (req, res) => {
     req.session.destroy();
     res.send({ "status": 1, "msg": "退出成功", "data": null })
 })
@@ -334,7 +335,7 @@ app.get('/api/user/message', (req, res) => {
 
 app.post('/api/user/sendMessage', (req, res) => {
     const { touser, message, type } = req.body;
-    if(!touser || !message || !type){
+    if (!touser || !message || !type) {
         return res.send({ "status": 0, "msg": "参数错误", "data": null })
     }
     const { uid } = req.session;
@@ -386,7 +387,7 @@ const storage = multer.diskStorage({
         crypto.randomBytes(16, (err, raw) => {
             if (err) return cb(err);
             // 使用发送人uid-接收人uid-时间戳-8位随机数作为文件名
-            cb(null, req.session.uid +'-'+req.query.touid + '-' + Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname));
+            cb(null, req.session.uid + '-' + req.query.touid + '-' + Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname));
             // cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
         });
     }
@@ -406,7 +407,7 @@ app.post('/api/user/upload/image', upload.single('image'), (req, res) => {
     res.send({ "status": 1, "msg": "上传成功", "data": req.file.filename });
 });
 
-app.post('/api/forgotPassword', (req, res) => { 
+app.post('/api/forgotPassword', (req, res) => {
     const { uid, username } = req.session;
     const { password } = req.body;
     if (!password) {
@@ -420,8 +421,164 @@ app.post('/api/forgotPassword', (req, res) => {
     });
 });
 
+app.get('/api/user/getWSToken', (req, res) => {
+    const { uid, username } = req.session;
+    const token = Math.random().toString(36).substr(2, 9);
+    db.run('INSERT INTO wstoken (uid, token, username) VALUES (?, ?, ?)', [uid, token, username], function (err) {
+        if (err) {
+            return res.status(500).send({ "status": 0, "msg": err.message, "data": null });
+        }
+        return res.send({ "status": 1, "msg": "获取成功", "data": token })
+    });
+});
 
-const PORT = process.env.PORT || 18878;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+
+
+const WebSocket = require('ws');
+const http = require('http');
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const clients = {};
+
+
+wss.on('connection', (ws, req) => {
+    var onlineUser = ''
+    // console.log("客户端发起连接")
+
+    // 获取客户端的token参数
+    try {
+        var token = req.url.split('?')[1].split('=')[1];
+        // var path = req.url.split('?')[0];
+    } catch (error) {
+        console.log(error);
+        return ws.close();
+    }
+    db.all('SELECT * FROM wstoken WHERE token = ?', [token], (err, rows) => {
+        if (err) {
+            console.log(err);
+            ws.send(JSON.stringify({ "status": 0, "message": "数据库错误", "data": null }));
+            return ws.close();
+        }
+        if (rows.length === 0) {
+            console.log('token不存在');
+            ws.send(JSON.stringify({ "status": 0, "message": "未登录", "data": null }));
+            return ws.close();
+        }
+        ws.id = rows[0].uid;
+        onlineUser = rows[0].username
+        console.log('用户' + onlineUser + '连接成功');
+        clients[ws.id] = ws;
+        // 广播用户上线
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({ "status": 1, "message": "成功", "data": { "uid": ws.id, "name": onlineUser }, "type": 4, "userStatus": 1 }));
+            }
+        });
+        // console.log('连接成功');
+    });
+    // 向客户端发送在线用户列表
+    ws.send(JSON.stringify({ "status": 1, "message": "成功", "data": Object.keys(clients), "type": 3 }));
+    ws.on('message', message => {
+        // console.log('接收到消息', message.toString());
+        if (message.toString() === 'ping') return ws.send('pong');
+        // 将消息发送给其他客户端
+        let msgData = JSON.parse(message); // Use let to declare msgData
+        msgData['from'] = ws.id;
+        // type 1: 文字消息 2: 消息已读通知
+        // 客户端发送消息已读
+        if (msgData['rawtype'] == 2) {
+            db.run('UPDATE msgdata SET status = TRUE WHERE fromuid = ? AND touid = ?', [msgData.fromuid, msgData.from], function (err) {
+                if (err) {
+                    return ws.send(JSON.stringify({ "status": 0, "msg": err.message, "data": null }));
+                }
+                return ws.send(JSON.stringify({ "status": 1, "msg": "成功", "data": null }))
+            });
+        }
+        if (msgData['rawtype'] == 1) {
+            var userStatus = 0
+            msgData['time'] = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + ' ' + new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds()
+            if (msgData['touser'] in clients) {
+                console.log("对方在线")
+                userStatus = 1
+                msgData['fromuid'] = msgData.from
+                clients[msgData['touser']].send(JSON.stringify({ "status": 1, "message": "成功", "data": msgData, "type": 1 }));
+            } else {
+                console.log("对方不在线")
+            }
+            if (!ws.id || !msgData.touser || !msgData.message || !msgData.type) { 
+                return ws.send(JSON.stringify({ "status": 0, "msg": "参数错误", "data": null }))
+            }
+            db.run('INSERT INTO msgdata (fromuid, touid, message, type) VALUES (?, ?, ?, ?)', [ws.id, msgData.touser, msgData.message, msgData.type], function (err) {
+                if (err) {
+                    return ws.send(JSON.stringify({ "status": 0, "msg": err.message, "data": null }));
+                }
+                console.log("消息保存成功")
+                console.log(msgData)
+                return ws.send(JSON.stringify({ "status": 1, "msg": "发送成功", "data": msgData, "type": 2 }))
+            });
+        }
+        if (msgData['rawtype'] == 3) {
+            // 客户端获取在线用户列表
+            ws.send(JSON.stringify({ "status": 1, "message": "成功", "data": Object.keys(clients), "type": 3 }));
+        }
+        // ws.send('服务器已收到消息');
+    });
+    // 当客户端关闭连接时，将其从连接池中移除
+    ws.on('close', () => {
+        clearInterval(interval);
+        console.log('连接关闭');
+        delete clients[ws.id];
+        // 广播用户下线
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({ "status": 1, "message": "成功", "data": { "uid": ws.id, "name": onlineUser }, "type": 4, "userStatus": 0 }));
+            }
+        });
+    });
+    // 每隔30秒向客户端发送ping消息，如果客户端在60秒内没有响应，则关闭连接
+    ws.isAlive = true;
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
+    const interval = setInterval(() => {
+        wss.clients.forEach(ws => {
+            if (ws.isAlive === false) {
+                console.log('连接关闭');
+                delete clients[ws.id];
+                // 广播用户下线
+                wss.clients.forEach(client => {
+                    if (client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({ "status": 1, "message": "成功", "data": { "uid": ws.id, "name": onlineUser }, "type": 4, "userStatus": 0 }));
+                    }
+                });
+                return ws.terminate();
+            }
+            ws.isAlive = false;
+            ws.ping(() => { });
+        });
+    }, 30000);
+
+});
+
+// 测试错误处理中间件
+app.get('/api/error', (req, res) => { 
+    throw new Error('服务器错误');
+});
+
+
+
+// 错误处理中间件
+app.use((err, req, res, next) => {
+    // console.error(err.stack);
+    res.status(500).send({ "status": 0, "msg": err.message, "data": null });
+});
+// 404 中间件
+app.use((req, res) => {
+    res.status(404).send({ "status": 0, "msg": "404 Not Found", "data": null });
+});
+
+server.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
 });

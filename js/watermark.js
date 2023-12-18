@@ -9,7 +9,7 @@ function watermark() {
         overlay.classList.add("watermark-overlay");
         var text = document.createElement("div");
         text.classList.add("watermark-text");
-        text.textContent = "图书馆预约助手\n" + localStorage.getItem('name');
+        text.textContent = "小猪猪";
         overlay.appendChild(text);
         document.body.appendChild(overlay);
         console.log("创建水印");
